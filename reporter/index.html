@@ -3,42 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reporter Panel | जन सूचना मंच</title>
+<title>खबर भेजें | इमामगंज जनसूचना मंच</title>
 <style>
+*{box-sizing:border-box}
 body{font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#f3f6fa;margin:0;color:#172033}
-header{background:#071f49;color:#fff;padding:18px;text-align:center}
+header{background:#071f49;color:#fff;padding:20px;text-align:center}
+header h1{margin:0 0 7px}
 .container{width:92%;max-width:850px;margin:25px auto}
-.card{background:#fff;padding:22px;border-radius:10px;box-shadow:0 2px 10px #0001;margin-bottom:18px}
-h1,h2{color:#071f49}label{display:block;font-weight:bold;margin:12px 0 6px}
-input,textarea,select{width:100%;padding:12px;border:1px solid #ccd3df;border-radius:6px;font-size:15px;box-sizing:border-box}
-button,a.btn{border:0;background:#d71920;color:#fff;padding:12px 18px;border-radius:6px;font-weight:bold;display:inline-block;text-decoration:none;margin-top:15px}
+.card{background:#fff;padding:22px;border-radius:12px;box-shadow:0 2px 10px #0001;margin-bottom:18px}
+h2{color:#071f49}
+label{display:block;font-weight:bold;margin:14px 0 6px}
+input,textarea,select{width:100%;padding:12px;border:1px solid #ccd3df;border-radius:7px;font-size:15px}
+textarea{resize:vertical}
+button,a.btn{border:0;background:#d71920;color:#fff;padding:13px 18px;border-radius:7px;font-weight:bold;display:inline-block;text-decoration:none;margin-top:18px;cursor:pointer}
+button{width:100%;font-size:16px}
+button:disabled{opacity:.6}
 .back{background:#0756b8!important}
-.note{background:#fff3cd;padding:12px;border-radius:6px}
+.note{background:#fff3cd;padding:12px;border-radius:7px}
+#msg{display:none;margin-top:15px;padding:13px;border-radius:7px;font-weight:bold}
+.success{background:#d1e7dd;color:#0f5132}
+.error{background:#f8d7da;color:#842029}
+.small{font-size:13px;color:#666}
 </style>
 </head>
+
 <body>
-<header><h1 style="color:#fff">👨‍💼 Reporter Panel</h1><p>नगर पंचायत इमामगंज — जन सूचना मंच</p></header>
+
+<header>
+<h1>📰 इमामगंज जनसूचना मंच</h1>
+<p>अपने क्षेत्र की खबर हमें भेजें</p>
+</header>
+
 <main class="container">
-<div class="card">
-<h2>Reporter Login</h2>
-<p class="note">अभी यह interface है। Supabase जोड़ने के बाद यहाँ असली Login/Registration काम करेगा।</p>
-<label>Email</label><input type="email" placeholder="Reporter Email">
-<label>Password</label><input type="password" placeholder="Password">
-<button onclick="alert('Supabase connect होने के बाद Login सक्रिय होगा।')">Login</button>
-<a class="btn back" href="../index.html">होम पर जाएँ</a>
-</div>
 
 <div class="card">
-<h2>📰 नई खबर भेजें</h2>
-<label>खबर की Headline</label><input placeholder="खबर की मुख्य हेडलाइन">
-<label>Category</label>
-<select><option>इमामगंज</option><option>जन समस्या</option><option>बिहार</option><option>सरकारी सूचना</option><option>अन्य</option></select>
-<label>स्थान</label><input placeholder="गाँव / पंचायत / वार्ड">
-<label>खबर का विवरण</label><textarea rows="7" placeholder="पूरी खबर लिखें..."></textarea>
-<label>फोटो</label><input type="file" accept="image/*">
-<label>वीडियो</label><input type="file" accept="video/*">
-<button onclick="alert('Supabase जोड़ने के बाद खबर database में जाएगी और Admin approval के लिए Pending होगी।')">खबर Submit करें</button>
+<h2>📝 खबर भेजें</h2>
+
+<div class="note">
+आपकी खबर पहले <b>Pending</b> रहेगी। Admin द्वारा जाँच और अनुमति के बाद ही उसे सार्वजनिक किया जाएगा।
+</div>
+
+<form id="newsForm">
+
+<label>खबर की Headline *</label>
+<input id="title" type="text" placeholder="खबर की मुख्य हेडलाइन" required>
+
+<label>Category *</label>
+<select id="category" required>
+<option value="">Category चुनें</option>
+<option>इमामगंज</option>
+<option>जन समस्या</option>
+<option>बिहार</option>
+<option>सरकारी सूचना</option>
+<option>शिक्षा</option>
+<option>स्वास्थ्य</option>
+<option>अन्य</option>
+</select>
+
+<label>स्थान *</label>
+<input id="location" type="text" placeholder="गाँव / पंचायत / वार्ड" required>
+
+<label>खबर का विवरण *</label>
+<textarea id="content" rows="8" placeholder="पूरी खबर की जानकारी लिखें..." required></textarea>
+
+<label>आपका नाम *</label>
+<input id="reporter_name" type="text" placeholder="अपना नाम" required>
+
+<label>मोबाइल नंबर *</label>
+<input id="reporter_phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" required>
+
+<label>फोटो का लिंक (वैकल्पिक)</label>
+<input id="image_url" type="url" placeholder="फोटो का URL यदि उपलब्ध हो">
+
+<button id="submitBtn" type="submit">📨 खबर Submit करें</button>
+
+<div id="msg"></div>
+
+</form>
+
+<p class="small">
+नोट: फोटो/वीडियो की direct file upload सुविधा हम अगले चरण में Supabase Storage से जोड़ेंगे।
+</p>
+
+<a class="btn back" href="../index.html">← होम पर जाएँ</a>
+
 </div>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://khuuooomxgabrxxbcgt.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const form = document.getElementById("newsForm");
+const button = document.getElementById("submitBtn");
+const msg = document.getElementById("msg");
+
+function showMessage(text, type) {
+  msg.textContent = text;
+  msg.className = type;
+  msg.style.display = "block";
+}
+
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  msg.style.display = "none";
+  button.disabled = true;
+  button.textContent = "⏳ खबर भेजी जा रही है...";
+
+  const phone = document.getElementById("reporter_phone").value.trim();
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+    showMessage("❌ कृपया सही 10 अंकों का मोबाइल नंबर डालें।", "error");
+    button.disabled = false;
+    button.textContent = "📨 खबर Submit करें";
+    return;
+  }
+
+  const newsData = {
+    title: document.getElementById("title").value.trim(),
+    content: document.getElementById("content").value.trim(),
+    reporter_name: document.getElementById("reporter_name").value.trim(),
+    reporter_phone: phone,
+    location: document.getElementById("location").value.trim(),
+    image_url: document.getElementById("image_url").value.trim() || null,
+    status: "pending"
+  };
+
+  const { error } = await supabaseClient
+    .from("news")
+    .insert([newsData]);
+
+  if (error) {
+    console.error(error);
+    showMessage(
+      "❌ खबर भेजने में समस्या हुई। कृपया थोड़ी देर बाद दोबारा प्रयास करें।",
+      "error"
+    );
+  } else {
+    showMessage(
+      "✅ आपकी खबर सफलतापूर्वक भेज दी गई है। Admin की जाँच के बाद खबर प्रकाशित होगी।",
+      "success"
+    );
+    form.reset();
+  }
+
+  button.disabled = false;
+  button.textContent = "📨 खबर Submit करें";
+});
+</script>
+
 </body>
 </html>
