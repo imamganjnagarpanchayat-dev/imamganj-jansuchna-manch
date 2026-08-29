@@ -145,7 +145,7 @@ form.addEventListener("submit", async function(e) {
   if (error) {
     console.error(error);
     showMessage(
-      "❌ खबर भेजने में समस्या हुई। कृपया थोड़ी देर बाद दोबारा प्रयास करें।",
+      "❌ Supabase Error: " + (error.message || "Unknown error") + " | Code: " + (error.code || "N/A"),
       "error"
     );
   } else {
