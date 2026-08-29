@@ -52,5 +52,10 @@ button,a{border:0;background:#d71920;color:#fff;padding:11px 16px;border-radius:
 <button>Block</button>
 </div>
 </main>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase = createClient("https://khuuuoaomxgabrxxbcgt.supabase.co","sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk");
+console.log("Supabase connected");
+</script>
 </body>
 </html>
