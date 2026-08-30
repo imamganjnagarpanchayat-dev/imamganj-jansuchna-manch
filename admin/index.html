@@ -198,7 +198,27 @@ newsList.innerHTML=pending.map(n=>`
 
 <p><strong>📍 Location:</strong> ${escapeHtml(n.location||"—")}</p>
 
-${n.image_url?`<p><a href="${n.image_url}" target="_blank">🖼️ Image देखें</a></p>`:""}
+${n.image_url ? `
+<div style="margin:12px 0;">
+  <p><strong>🖼️ फोटो:</strong></p>
+  <img src="${escapeHtml(n.image_url)}"
+       alt="News Image"
+       style="width:100%;max-width:500px;max-height:300px;object-fit:contain;border-radius:10px;border:1px solid #ddd;">
+  <p><a href="${escapeHtml(n.image_url)}" target="_blank" rel="noopener">🔗 फोटो खोलें</a></p>
+</div>
+` : ""}
+
+${n.video_url ? `
+<div style="margin:12px 0;">
+  <p><strong>🎥 वीडियो:</strong></p>
+  <video controls playsinline preload="metadata"
+         style="width:100%;max-width:600px;max-height:350px;border-radius:10px;background:#000;">
+    <source src="${escapeHtml(n.video_url)}" type="video/mp4">
+    आपका ब्राउज़र वीडियो प्ले नहीं कर सकता।
+  </video>
+  <p><a href="${escapeHtml(n.video_url)}" target="_blank" rel="noopener">🔗 वीडियो खोलें</a></p>
+</div>
+` : ""}
 
 <button onclick="updateNews(${n.id},'published')">✅ Publish</button>
 

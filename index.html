@@ -145,7 +145,7 @@ async function loadPublicNews(){
 
   const {data,error}=await publicClient
     .from("news")
-    .select("id,title,content,reporter_name,location,image_url,created_at")
+    .select("id,title,content,reporter_name,location,image_url,video_url,media_type,created_at")
     .eq("status","published")
     .order("created_at",{ascending:false})
     .limit(12);
@@ -174,7 +174,15 @@ async function loadPublicNews(){
         ${n.image_url ? `
           <img src="${safeText(n.image_url)}"
                alt="${safeText(n.title || "News Image")}"
-               style="width:100%;max-height:220px;object-fit:cover;border-radius:7px;margin:8px 0;">
+               style="width:100%;max-height:300px;object-fit:contain;border-radius:8px;margin:8px 0;background:#f3f3f3;">
+        ` : ""}
+
+        ${n.video_url ? `
+          <video controls playsinline preload="metadata"
+                 style="width:100%;max-height:350px;border-radius:8px;margin:8px 0;background:#000;">
+            <source src="${safeText(n.video_url)}" type="video/mp4">
+            आपका ब्राउज़र वीडियो प्ले नहीं कर सकता।
+          </video>
         ` : ""}
         <p>${safeText(n.content || "")}</p>
         ${n.location ? `<p>📍 ${safeText(n.location)}</p>` : ""}
