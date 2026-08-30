@@ -389,7 +389,10 @@ async function createVideoThumbnail(file){
       canvas.width=video.videoWidth;
       canvas.height=video.videoHeight;
 
-      video.currentTime=0.1;
+      video.currentTime = Math.min(
+        1,
+        Math.max(0.1, (video.duration || 1) * 0.10)
+      );
     };
 
     video.onseeked=()=>{

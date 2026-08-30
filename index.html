@@ -236,7 +236,7 @@ async function loadPublicNews(){
       <article class="news">
         <span class="badge">इमामगंज</span>
         <h3>${safeText(n.title || "बिना शीर्षक")}</h3>
-        ${n.image_url ? `
+        ${n.image_url && !n.video_url ? `
           <img src="${safeText(n.image_url)}"
                alt="${safeText(n.title || "News Image")}"
                style="width:100%;max-height:300px;object-fit:contain;border-radius:8px;margin:8px 0;background:#f3f3f3;">
