@@ -114,5 +114,80 @@ footer{background:#061631;color:#fff;text-align:center;padding:25px;margin-top:3
 </main>
 
 <footer><strong>नगर पंचायत इमामगंज — जन सूचना मंच</strong><br>सही खबर • तेज खबर • आपके साथ<br>© 2026 Imamganj Jansuchna Manch</footer>
+
+<!-- PUBLIC NEWS SUPABASE START -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const PUBLIC_SUPABASE_URL="https://khuuuoaomxgabrxxbcgt.supabase.co";
+const PUBLIC_SUPABASE_KEY="sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
+
+const publicClient=window.supabase.createClient(
+  PUBLIC_SUPABASE_URL,
+  PUBLIC_SUPABASE_KEY
+);
+
+function safeText(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+async function loadPublicNews(){
+
+  const section=document.querySelector("#latest + .grid");
+
+  if(!section) return;
+
+  section.innerHTML='<article class="news"><p>⏳ ताजा खबरें लोड हो रही हैं...</p></article>';
+
+  const {data,error}=await publicClient
+    .from("news")
+    .select("id,title,content,reporter_name,location,image_url,created_at")
+    .eq("status","published")
+    .order("created_at",{ascending:false})
+    .limit(12);
+
+  if(error){
+    console.error("Public news error:",error);
+    section.innerHTML='<article class="news"><h3>📰 ताजा खबरें</h3><p>खबरें अभी लोड नहीं हो सकीं।</p></article>';
+    return;
+  }
+
+  if(!data || data.length===0){
+    section.innerHTML='<article class="news"><span class="badge">इमामगंज</span><h3>अभी कोई प्रकाशित खबर नहीं है</h3><p>Admin द्वारा प्रकाशित की गई खबरें यहाँ दिखाई देंगी।</p></article>';
+    return;
+  }
+
+  section.innerHTML=data.map(n=>{
+
+    const date=n.created_at
+      ? new Date(n.created_at).toLocaleDateString("hi-IN")
+      : "";
+
+    return `
+      <article class="news">
+        <span class="badge">इमामगंज</span>
+        <h3>${safeText(n.title || "बिना शीर्षक")}</h3>
+        ${n.image_url ? `
+          <img src="${safeText(n.image_url)}"
+               alt="${safeText(n.title || "News Image")}"
+               style="width:100%;max-height:220px;object-fit:cover;border-radius:7px;margin:8px 0;">
+        ` : ""}
+        <p>${safeText(n.content || "")}</p>
+        ${n.location ? `<p>📍 ${safeText(n.location)}</p>` : ""}
+        ${n.reporter_name ? `<p>👤 ${safeText(n.reporter_name)}</p>` : ""}
+        <p style="font-size:12px;color:#888;margin-top:8px;">${date}</p>
+      </article>
+    `;
+  }).join("");
+}
+
+loadPublicNews();
+</script>
+<!-- PUBLIC NEWS SUPABASE END -->
+
 </body>
 </html>
