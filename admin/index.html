@@ -53,16 +53,57 @@ button,a{border:0;background:#d71920;color:#fff;padding:11px 16px;border-radius:
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>const SUPABASE_URL="https://khuuuoaomxgabrxxbcgt.supabase.co"; const SUPABASE_KEY="sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk"; const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);</script>
 <script>
-async function login(){
-const email=document.querySelector("input[type=email]").value.trim();
-const password=document.querySelector("input[type=password]").value;
-if(!email || !password){alert("Email और Password डालें");return;}
-const result=await supabase.auth.signInWithPassword({email:email,password:password});
-if(result.error){alert("Login failed: "+result.error.message);return;}
-alert("✅ Login सफल हुआ");
+const SUPABASE_URL = "https://khuuuoaomxgabrxxbcgt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
+
+const client = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function login() {
+  const email = document.querySelector('input[type="email"]').value.trim();
+  const password = document.querySelector('input[type="password"]').value;
+
+  if (!email || !password) {
+    alert("Email और Password डालें");
+    return;
+  }
+
+  const button = document.getElementById("adminLoginBtn");
+  button.disabled = true;
+  button.textContent = "Login हो रहा है...";
+
+  try {
+    const { data, error } = await client.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      alert("❌ Login failed:\n" + error.message);
+      console.error(error);
+      return;
+    }
+
+    if (!data.session) {
+      alert("❌ Login हुआ लेकिन session नहीं बना।");
+      return;
+    }
+
+    alert("✅ Admin Login सफल हुआ!");
+
+  } catch (err) {
+    alert("❌ Error:\n" + (err.message || err));
+    console.error(err);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Login";
+  }
 }
+
+document.getElementById("adminLoginBtn").onclick = login;
 </script>
 </body>
 </html>
