@@ -128,16 +128,16 @@ form.addEventListener("submit", async function(e) {
     return;
   }
 
-  const newsData = {
-    title: document.getElementById("title").value.trim(),
-    content: document.getElementById("content").value.trim(),
-    reporter_name: document.getElementById("reporter_name").value.trim(),
-    reporter_phone: phone,
-    location: document.getElementById("location").value.trim(),
-    image_url: document.getElementById("image_url").value.trim() || null,
-    status: "pending"
-  };
-
+const newsData = {
+  title: document.getElementById("title").value.trim(),
+  category: document.getElementById("category").value,
+  content: document.getElementById("content").value.trim(),
+  reporter_name: document.getElementById("reporter_name").value.trim(),
+  reporter_phone: phone,
+  location: document.getElementById("location").value.trim(),
+  image_url: document.getElementById("image_url").value.trim() || null,
+  status: "pending"
+};
   const { error } = await supabaseClient
     .from("news")
     .insert([newsData]);
