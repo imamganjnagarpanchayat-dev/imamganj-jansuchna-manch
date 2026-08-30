@@ -364,6 +364,98 @@ async function uploadFile(file,folder){
 
 }
 
+
+async function createVideoThumbnail(file){
+
+  return new Promise((resolve,reject)=>{
+
+    const video=document.createElement("video");
+    const canvas=document.createElement("canvas");
+
+    video.preload="metadata";
+    video.muted=true;
+    video.playsInline=true;
+
+    const objectUrl=URL.createObjectURL(file);
+
+    video.onloadedmetadata=()=>{
+
+      if(!video.videoWidth || !video.videoHeight){
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("वीडियो का आकार पढ़ा नहीं जा सका।"));
+        return;
+      }
+
+      canvas.width=video.videoWidth;
+      canvas.height=video.videoHeight;
+
+      video.currentTime=0.1;
+    };
+
+    video.onseeked=()=>{
+
+      try{
+
+        const ctx=canvas.getContext("2d");
+
+        ctx.drawImage(
+          video,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        canvas.toBlob(
+          blob=>{
+            URL.revokeObjectURL(objectUrl);
+
+            if(!blob){
+              reject(new Error("वीडियो thumbnail नहीं बन सका।"));
+              return;
+            }
+
+            const thumbnailFile=new File(
+              [blob],
+              "video-thumbnail.jpg",
+              {
+                type:"image/jpeg",
+                lastModified:Date.now()
+              }
+            );
+
+            resolve(thumbnailFile);
+          },
+          "image/jpeg",
+          0.85
+        );
+
+      }catch(error){
+
+        URL.revokeObjectURL(objectUrl);
+        reject(error);
+
+      }
+
+    };
+
+    video.onerror=()=>{
+
+      URL.revokeObjectURL(objectUrl);
+
+      reject(
+        new Error("वीडियो से thumbnail नहीं बनाया जा सका।")
+      );
+
+    };
+
+    video.src=objectUrl;
+
+  });
+
+}
+
+
 form.addEventListener(
 "submit",
 async function(e){
@@ -435,6 +527,21 @@ async function(e){
       await uploadFile(
         videoFile,
         "videos"
+      );
+
+      button.textContent =
+      "⏳ वीडियो का Thumbnail बन रहा है...";
+
+      const thumbnailFile =
+      await createVideoThumbnail(videoFile);
+
+      button.textContent =
+      "⏳ वीडियो Thumbnail Upload हो रहा है...";
+
+      imageUrl =
+      await uploadFile(
+        thumbnailFile,
+        "images"
       );
 
       mediaType="video";
