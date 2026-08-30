@@ -4,26 +4,137 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>खबर भेजें | इमामगंज जनसूचना मंच</title>
+
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#f3f6fa;margin:0;color:#172033}
-header{background:#071f49;color:#fff;padding:20px;text-align:center}
-header h1{margin:0 0 7px}
-.container{width:92%;max-width:850px;margin:25px auto}
-.card{background:#fff;padding:22px;border-radius:12px;box-shadow:0 2px 10px #0001;margin-bottom:18px}
-h2{color:#071f49}
-label{display:block;font-weight:bold;margin:14px 0 6px}
-input,textarea,select{width:100%;padding:12px;border:1px solid #ccd3df;border-radius:7px;font-size:15px}
-textarea{resize:vertical}
-button,a.btn{border:0;background:#d71920;color:#fff;padding:13px 18px;border-radius:7px;font-weight:bold;display:inline-block;text-decoration:none;margin-top:18px;cursor:pointer}
-button{width:100%;font-size:16px}
-button:disabled{opacity:.6}
-.back{background:#0756b8!important}
-.note{background:#fff3cd;padding:12px;border-radius:7px}
-#msg{display:none;margin-top:15px;padding:13px;border-radius:7px;font-weight:bold}
-.success{background:#d1e7dd;color:#0f5132}
-.error{background:#f8d7da;color:#842029}
-.small{font-size:13px;color:#666}
+
+body{
+  font-family:Arial,"Noto Sans Devanagari",sans-serif;
+  background:#f3f6fa;
+  margin:0;
+  color:#172033
+}
+
+header{
+  background:#071f49;
+  color:#fff;
+  padding:20px;
+  text-align:center
+}
+
+header h1{
+  margin:0 0 7px
+}
+
+.container{
+  width:92%;
+  max-width:850px;
+  margin:25px auto
+}
+
+.card{
+  background:#fff;
+  padding:22px;
+  border-radius:12px;
+  box-shadow:0 2px 10px #0001;
+  margin-bottom:18px
+}
+
+h2{
+  color:#071f49
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin:14px 0 6px
+}
+
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #ccd3df;
+  border-radius:7px;
+  font-size:15px
+}
+
+textarea{
+  resize:vertical
+}
+
+button,a.btn{
+  border:0;
+  background:#d71920;
+  color:#fff;
+  padding:13px 18px;
+  border-radius:7px;
+  font-weight:bold;
+  display:inline-block;
+  text-decoration:none;
+  margin-top:18px;
+  cursor:pointer
+}
+
+button{
+  width:100%;
+  font-size:16px
+}
+
+button:disabled{
+  opacity:.6
+}
+
+.back{
+  background:#0756b8!important
+}
+
+.note{
+  background:#fff3cd;
+  padding:12px;
+  border-radius:7px
+}
+
+.upload-box{
+  border:2px dashed #0756b8;
+  padding:18px;
+  border-radius:10px;
+  background:#f7fbff;
+  margin-top:8px
+}
+
+.upload-box input{
+  background:#fff
+}
+
+.file-info{
+  margin-top:8px;
+  font-size:13px;
+  color:#555
+}
+
+#msg{
+  display:none;
+  margin-top:15px;
+  padding:13px;
+  border-radius:7px;
+  font-weight:bold
+}
+
+.success{
+  background:#d1e7dd;
+  color:#0f5132
+}
+
+.error{
+  background:#f8d7da;
+  color:#842029
+}
+
+.small{
+  font-size:13px;
+  color:#666;
+  line-height:1.6
+}
 </style>
 </head>
 
@@ -37,6 +148,7 @@ button:disabled{opacity:.6}
 <main class="container">
 
 <div class="card">
+
 <h2>📝 खबर भेजें</h2>
 
 <div class="note">
@@ -46,7 +158,12 @@ button:disabled{opacity:.6}
 <form id="newsForm">
 
 <label>खबर की Headline *</label>
-<input id="title" type="text" placeholder="खबर की मुख्य हेडलाइन" required>
+<input
+  id="title"
+  type="text"
+  placeholder="खबर की मुख्य हेडलाइन"
+  required
+>
 
 <label>Category *</label>
 <select id="category" required>
@@ -61,31 +178,81 @@ button:disabled{opacity:.6}
 </select>
 
 <label>स्थान *</label>
-<input id="location" type="text" placeholder="गाँव / पंचायत / वार्ड" required>
+<input
+  id="location"
+  type="text"
+  placeholder="गाँव / पंचायत / वार्ड"
+  required
+>
 
 <label>खबर का विवरण *</label>
-<textarea id="content" rows="8" placeholder="पूरी खबर की जानकारी लिखें..." required></textarea>
+<textarea
+  id="content"
+  rows="8"
+  placeholder="पूरी खबर की जानकारी लिखें..."
+  required
+></textarea>
 
 <label>आपका नाम *</label>
-<input id="reporter_name" type="text" placeholder="अपना नाम" required>
+<input
+  id="reporter_name"
+  type="text"
+  placeholder="अपना नाम"
+  required
+>
 
 <label>मोबाइल नंबर *</label>
-<input id="reporter_phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" required>
+<input
+  id="reporter_phone"
+  type="tel"
+  inputmode="numeric"
+  maxlength="10"
+  placeholder="10 अंकों का मोबाइल नंबर"
+  required
+>
 
-<label>फोटो का लिंक (वैकल्पिक)</label>
-<input id="image_url" type="url" placeholder="फोटो का URL यदि उपलब्ध हो">
+<label>📷 फोटो Upload करें</label>
 
-<button id="submitBtn" type="submit">📨 खबर Submit करें</button>
+<div class="upload-box">
+<input
+  id="image_file"
+  type="file"
+  accept="image/jpeg,image/png,image/webp,image/gif"
+>
+<div class="file-info">
+JPG, PNG, WEBP या GIF — अधिकतम 10 MB
+</div>
+</div>
+
+<label>🎥 वीडियो Upload करें</label>
+
+<div class="upload-box">
+<input
+  id="video_file"
+  type="file"
+  accept="video/mp4,video/webm,video/quicktime"
+>
+<div class="file-info">
+MP4, WebM या MOV — अधिकतम 50 MB
+</div>
+</div>
+
+<button id="submitBtn" type="submit">
+📨 खबर Submit करें
+</button>
 
 <div id="msg"></div>
 
 </form>
 
 <p class="small">
-नोट: फोटो/वीडियो की direct file upload सुविधा हम अगले चरण में Supabase Storage से जोड़ेंगे।
+<strong>नोट:</strong> फोटो/वीडियो सीधे सुरक्षित रूप से Upload होगा।
+पहले खबर Pending रहेगी और Admin की मंजूरी के बाद ही वेबसाइट पर दिखाई जाएगी।
 </p>
 
-<a class="btn back" href="../index.html">← होम पर जाएँ</a>
+<a class="btn back" href="../index.html">
+← होम पर जाएँ
+</a>
 
 </div>
 </main>
@@ -93,72 +260,263 @@ button:disabled{opacity:.6}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const SUPABASE_URL = "https://khuuuoaomxgabrxxbcgt.supabase.co";
 
-const SUPABASE_KEY = "sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
+const SUPABASE_URL =
+"https://khuuuoaomxgabrxxbcgt.supabase.co";
 
-const supabaseClient = window.supabase.createClient(
+const SUPABASE_KEY =
+"sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
+
+const supabaseClient =
+window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
 
-const form = document.getElementById("newsForm");
-const button = document.getElementById("submitBtn");
-const msg = document.getElementById("msg");
+const form =
+document.getElementById("newsForm");
 
-function showMessage(text, type) {
+const button =
+document.getElementById("submitBtn");
+
+const msg =
+document.getElementById("msg");
+
+function showMessage(text,type){
+
   msg.textContent = text;
   msg.className = type;
   msg.style.display = "block";
+
 }
 
-form.addEventListener("submit", async function(e) {
+function safeFileName(name){
+
+  return name
+    .replace(/[^a-zA-Z0-9._-]/g,"_")
+    .replace(/_+/g,"_");
+
+}
+
+async function uploadFile(file,folder){
+
+  if(!file){
+    return null;
+  }
+
+  const maxSize =
+    folder === "images"
+    ? 10 * 1024 * 1024
+    : 50 * 1024 * 1024;
+
+  if(file.size > maxSize){
+
+    throw new Error(
+      folder === "images"
+      ? "फोटो 10 MB से बड़ी है।"
+      : "वीडियो 50 MB से बड़ा है।"
+    );
+
+  }
+
+  const extension =
+    file.name.includes(".")
+    ? file.name.split(".").pop()
+    : "file";
+
+  const fileName =
+    Date.now() +
+    "-" +
+    crypto.randomUUID() +
+    "." +
+    extension;
+
+  const path =
+    folder +
+    "/" +
+    fileName;
+
+  const {error} =
+    await supabaseClient
+      .storage
+      .from("news-media")
+      .upload(
+        path,
+        file,
+        {
+          cacheControl:"3600",
+          upsert:false,
+          contentType:file.type
+        }
+      );
+
+  if(error){
+    throw error;
+  }
+
+  const {data} =
+    supabaseClient
+      .storage
+      .from("news-media")
+      .getPublicUrl(path);
+
+  return data.publicUrl;
+
+}
+
+form.addEventListener(
+"submit",
+async function(e){
+
   e.preventDefault();
 
-  msg.style.display = "none";
-  button.disabled = true;
-  button.textContent = "⏳ खबर भेजी जा रही है...";
+  msg.style.display="none";
 
-  const phone = document.getElementById("reporter_phone").value.trim();
+  button.disabled=true;
 
-  if (!/^[0-9]{10}$/.test(phone)) {
-    showMessage("❌ कृपया सही 10 अंकों का मोबाइल नंबर डालें।", "error");
-    button.disabled = false;
-    button.textContent = "📨 खबर Submit करें";
-    return;
-  }
+  button.textContent =
+  "⏳ खबर और Media Upload हो रहा है...";
 
-const newsData = {
-  title: document.getElementById("title").value.trim(),
-  category: document.getElementById("category").value,
-  content: document.getElementById("content").value.trim(),
-  reporter_name: document.getElementById("reporter_name").value.trim(),
-  reporter_phone: phone,
-  location: document.getElementById("location").value.trim(),
-  image_url: document.getElementById("image_url").value.trim() || null,
-  status: "pending"
-};
-  const { error } = await supabaseClient
-    .from("news")
-    .insert([newsData]);
+  try{
 
-  if (error) {
-    console.error(error);
+    const phone =
+    document
+      .getElementById("reporter_phone")
+      .value
+      .trim();
+
+    if(!/^[0-9]{10}$/.test(phone)){
+
+      throw new Error(
+        "कृपया सही 10 अंकों का मोबाइल नंबर डालें।"
+      );
+
+    }
+
+    const imageFile =
+    document.getElementById("image_file").files[0];
+
+    const videoFile =
+    document.getElementById("video_file").files[0];
+
+    if(imageFile && videoFile){
+
+      throw new Error(
+        "एक खबर में अभी फोटो या वीडियो में से केवल एक Media चुनें।"
+      );
+
+    }
+
+    let imageUrl=null;
+    let videoUrl=null;
+    let mediaType=null;
+
+    if(imageFile){
+
+      button.textContent =
+      "⏳ फोटो Upload हो रही है...";
+
+      imageUrl =
+      await uploadFile(
+        imageFile,
+        "images"
+      );
+
+      mediaType="image";
+
+    }
+
+    if(videoFile){
+
+      button.textContent =
+      "⏳ वीडियो Upload हो रहा है...";
+
+      videoUrl =
+      await uploadFile(
+        videoFile,
+        "videos"
+      );
+
+      mediaType="video";
+
+    }
+
+    const newsData={
+
+      title:
+      document
+        .getElementById("title")
+        .value
+        .trim(),
+
+      content:
+      document
+        .getElementById("content")
+        .value
+        .trim(),
+
+      reporter_name:
+      document
+        .getElementById("reporter_name")
+        .value
+        .trim(),
+
+      reporter_phone:phone,
+
+      location:
+      document
+        .getElementById("location")
+        .value
+        .trim(),
+
+      image_url:imageUrl,
+
+      video_url:videoUrl,
+
+      media_type:mediaType,
+
+      status:"pending"
+
+    };
+
+    button.textContent =
+    "⏳ खबर Save हो रही है...";
+
+    const {error} =
+    await supabaseClient
+      .from("news")
+      .insert([newsData]);
+
+    if(error){
+      throw error;
+    }
+
     showMessage(
-      "❌ Supabase Error: " + (error.message || "Unknown error") + " | Code: " + (error.code || "N/A"),
-      "error"
-    );
-  } else {
-    showMessage(
-      "✅ आपकी खबर सफलतापूर्वक भेज दी गई है। Admin की जाँच के बाद खबर प्रकाशित होगी।",
+      "✅ आपकी खबर और Media सफलतापूर्वक भेज दिया गया है। Admin की जाँच के बाद खबर प्रकाशित होगी।",
       "success"
     );
+
     form.reset();
+
+  }catch(error){
+
+    console.error(error);
+
+    showMessage(
+      "❌ Error: " +
+      (error.message || "Upload में समस्या हुई।"),
+      "error"
+    );
+
   }
 
-  button.disabled = false;
-  button.textContent = "📨 खबर Submit करें";
+  button.disabled=false;
+
+  button.textContent =
+  "📨 खबर Submit करें";
+
 });
+
 </script>
 
 </body>
