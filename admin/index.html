@@ -80,7 +80,19 @@ button:disabled{opacity:.6}
 const SUPABASE_URL="https://khuuuoaomxgabrxxbcgt.supabase.co";
 const SUPABASE_KEY="sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
 
-const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const ADMIN_EMAIL="imamganjnagarpanchayat@gmail.com";
+
+const client=window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY,
+  {
+    auth:{
+      persistSession:false,
+      autoRefreshToken:true,
+      detectSessionInUrl:true
+    }
+  }
+);
 
 const loginMessage=document.getElementById("loginMessage");
 const dashboard=document.getElementById("dashboard");
@@ -124,6 +136,16 @@ return;
 if(!data.session){
 showLoginMessage("❌ Session नहीं बना।","error");
 return;
+}
+
+const loggedInEmail=(data.user?.email||"").toLowerCase();
+
+if(loggedInEmail !== ADMIN_EMAIL.toLowerCase()){
+  await client.auth.signOut();
+  dashboard.classList.add("hidden");
+  document.getElementById("logoutBtn").classList.add("hidden");
+  showLoginMessage("❌ यह Account Admin नहीं है। केवल अधिकृत Admin ही Login कर सकता है।","error");
+  return;
 }
 
 showLoginMessage("✅ Admin Login सफल हुआ!");
@@ -402,16 +424,26 @@ return String(value)
 
 async function checkSession(){
 
+dashboard.classList.add("hidden");
+document.getElementById("logoutBtn").classList.add("hidden");
+
 const {data}=await client.auth.getSession();
 
-if(data&&data.session){
+if(!data || !data.session){
+  return;
+}
+
+const loggedInEmail=(data.session.user?.email||"").toLowerCase();
+
+if(loggedInEmail !== ADMIN_EMAIL.toLowerCase()){
+  await client.auth.signOut();
+  return;
+}
 
 dashboard.classList.remove("hidden");
 document.getElementById("logoutBtn").classList.remove("hidden");
 
 await loadDashboard();
-
-}
 
 }
 
