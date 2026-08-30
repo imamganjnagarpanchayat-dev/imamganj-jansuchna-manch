@@ -10,100 +10,268 @@ header{background:#071f49;color:#fff;padding:18px;text-align:center}
 .container{width:92%;max-width:1100px;margin:25px auto}
 .login,.card{background:#fff;padding:22px;border-radius:10px;box-shadow:0 2px 10px #0001;margin-bottom:18px}
 input{width:100%;padding:12px;border:1px solid #ccd3df;border-radius:6px;box-sizing:border-box;margin:7px 0}
-button,a{border:0;background:#d71920;color:#fff;padding:11px 16px;border-radius:6px;font-weight:bold;text-decoration:none;display:inline-block;margin-top:10px}
+button,a{border:0;background:#d71920;color:#fff;padding:11px 16px;border-radius:6px;font-weight:bold;text-decoration:none;display:inline-block;margin-top:10px;cursor:pointer}
+button:disabled{opacity:.6}
 .back{background:#0756b8}
+.logout{background:#555}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .stat{background:#fff;padding:20px;border-radius:8px;text-align:center;box-shadow:0 2px 8px #0001}
 .stat b{display:block;font-size:28px;color:#0756b8}
+.news-card{border:1px solid #ddd;border-radius:8px;padding:16px;margin:12px 0;background:#fafafa}
+.status{display:inline-block;padding:5px 9px;border-radius:5px;background:#ffe08a;margin-bottom:10px}
+.success{background:#e7f7e7;padding:12px;border-radius:7px;margin:10px 0}
+.error{background:#ffe8e8;padding:12px;border-radius:7px;margin:10px 0}
+.hidden{display:none}
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<header><h1 style="color:#fff">🔐 Admin Panel</h1><p>नगर पंचायत इमामगंज — जन सूचना मंच</p></header>
+
+<header>
+<h1>🔐 Admin Panel</h1>
+<p>नगर पंचायत इमामगंज — जन सूचना मंच</p>
+</header>
+
 <main class="container">
+
 <div class="login">
 <h2>Admin Login</h2>
-<p>अभी interface तैयार है। Supabase जोड़ने के बाद secure authentication लगेगा।</p>
-<input type="email" placeholder="Admin Email">
-<input type="password" placeholder="Password">
+<p>Supabase सुरक्षित authentication</p>
+
+<input id="email" type="email" placeholder="Admin Email" value="imamganjnagarpanchayat@gmail.com">
+<input id="password" type="password" placeholder="Password">
+
 <button id="adminLoginBtn" onclick="login()">Login</button>
+<button class="logout hidden" id="logoutBtn" onclick="logout()">Logout</button>
 <a class="back" href="../index.html">होम</a>
+
+<div id="loginMessage"></div>
 </div>
 
-<h2>Dashboard</h2>
+<div id="dashboard" class="hidden">
+
+<h2>📊 Dashboard</h2>
+
 <section class="stats">
-<div class="stat"><b>0</b>कुल खबरें</div>
-<div class="stat"><b>0</b>Pending</div>
-<div class="stat"><b>0</b>Published</div>
-<div class="stat"><b>0</b>Reporters</div>
+<div class="stat"><b id="totalCount">0</b>कुल खबरें</div>
+<div class="stat"><b id="pendingCount">0</b>Pending</div>
+<div class="stat"><b id="publishedCount">0</b>Published</div>
+<div class="stat"><b id="reporterCount">0</b>Reporters</div>
 </section>
 
 <div class="card">
 <h2>📰 News Management</h2>
-<p>Pending खबरें यहाँ दिखाई जाएँगी। Admin उन्हें Publish या Reject कर सकेगा।</p>
-<button>Publish</button>
-<button>Reject</button>
+<div id="newsMessage"></div>
+<div id="newsList"></div>
 </div>
 
 <div class="card">
 <h2>👨‍💼 Reporter Management</h2>
-<p>Reporter accounts को Activate/Block करने का section।</p>
-<button>Activate</button>
-<button>Block</button>
+<p>Reporter accounts का management यहाँ होगा।</p>
+<strong>Reporters: <span id="reporterCount2">0</span></strong>
+</div>
+
 </div>
 </main>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const SUPABASE_URL = "https://khuuuoaomxgabrxxbcgt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
+const SUPABASE_URL="https://khuuuoaomxgabrxxbcgt.supabase.co";
+const SUPABASE_KEY="sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
 
-const client = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-async function login() {
-  const email = document.querySelector('input[type="email"]').value.trim();
-  const password = document.querySelector('input[type="password"]').value;
+const loginMessage=document.getElementById("loginMessage");
+const dashboard=document.getElementById("dashboard");
+const newsList=document.getElementById("newsList");
+const newsMessage=document.getElementById("newsMessage");
 
-  if (!email || !password) {
-    alert("Email और Password डालें");
-    return;
-  }
-
-  const button = document.getElementById("adminLoginBtn");
-  button.disabled = true;
-  button.textContent = "Login हो रहा है...";
-
-  try {
-    const { data, error } = await client.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) {
-      alert("❌ Login failed:\n" + error.message);
-      console.error(error);
-      return;
-    }
-
-    if (!data.session) {
-      alert("❌ Login हुआ लेकिन session नहीं बना।");
-      return;
-    }
-
-    alert("✅ Admin Login सफल हुआ!");
-
-  } catch (err) {
-    alert("❌ Error:\n" + (err.message || err));
-    console.error(err);
-  } finally {
-    button.disabled = false;
-    button.textContent = "Login";
-  }
+function showLoginMessage(text,type="success"){
+loginMessage.innerHTML="<div class='"+type+"'>"+text+"</div>";
 }
 
-document.getElementById("adminLoginBtn").onclick = login;
+function showNewsMessage(text,type="success"){
+newsMessage.innerHTML="<div class='"+type+"'>"+text+"</div>";
+}
+
+async function login(){
+
+const email=document.getElementById("email").value.trim();
+const password=document.getElementById("password").value;
+const button=document.getElementById("adminLoginBtn");
+
+if(!email||!password){
+showLoginMessage("❌ Email और Password डालें","error");
+return;
+}
+
+button.disabled=true;
+button.textContent="Login हो रहा है...";
+
+try{
+
+const {data,error}=await client.auth.signInWithPassword({
+email:email,
+password:password
+});
+
+if(error){
+showLoginMessage("❌ Login failed: "+error.message,"error");
+return;
+}
+
+if(!data.session){
+showLoginMessage("❌ Session नहीं बना।","error");
+return;
+}
+
+showLoginMessage("✅ Admin Login सफल हुआ!");
+
+document.getElementById("logoutBtn").classList.remove("hidden");
+dashboard.classList.remove("hidden");
+
+await loadDashboard();
+
+}catch(err){
+
+showLoginMessage("❌ Error: "+(err.message||err),"error");
+
+}finally{
+
+button.disabled=false;
+button.textContent="Login";
+
+}
+}
+
+async function loadDashboard(){
+
+showNewsMessage("⏳ खबरें लोड हो रही हैं...");
+
+const {data,error}=await client
+.from("news")
+.select("*")
+.order("created_at",{ascending:false});
+
+if(error){
+
+showNewsMessage("❌ News load error: "+error.message,"error");
+return;
+
+}
+
+const news=data||[];
+
+document.getElementById("totalCount").textContent=news.length;
+
+const pending=news.filter(n=>n.status==="pending");
+const published=news.filter(n=>n.status==="published");
+
+document.getElementById("pendingCount").textContent=pending.length;
+document.getElementById("publishedCount").textContent=published.length;
+
+document.getElementById("reporterCount").textContent=0;
+document.getElementById("reporterCount2").textContent=0;
+
+if(pending.length===0){
+
+newsList.innerHTML="<div class='success'>✅ अभी कोई Pending खबर नहीं है।</div>";
+newsMessage.innerHTML="";
+return;
+
+}
+
+newsList.innerHTML=pending.map(n=>`
+
+<div class="news-card">
+
+<span class="status">⏳ Pending</span>
+
+<h3>${escapeHtml(n.title||"बिना शीर्षक")}</h3>
+
+<p>${escapeHtml(n.content||"")}</p>
+
+<p><strong>👤 Reporter:</strong> ${escapeHtml(n.reporter_name||"—")}</p>
+
+<p><strong>📞 Phone:</strong> ${escapeHtml(n.reporter_phone||"—")}</p>
+
+<p><strong>📍 Location:</strong> ${escapeHtml(n.location||"—")}</p>
+
+${n.image_url?`<p><a href="${n.image_url}" target="_blank">🖼️ Image देखें</a></p>`:""}
+
+<button onclick="updateNews(${n.id},'published')">✅ Publish</button>
+
+<button onclick="updateNews(${n.id},'rejected')">❌ Reject</button>
+
+</div>
+
+`).join("");
+
+newsMessage.innerHTML="";
+}
+
+async function updateNews(id,status){
+
+const action=status==="published"?"Publish":"Reject";
+
+if(!confirm("क्या आप इस खबर को "+action+" करना चाहते हैं?")) return;
+
+const {error}=await client
+.from("news")
+.update({status:status})
+.eq("id",id);
+
+if(error){
+
+showNewsMessage("❌ "+action+" failed: "+error.message,"error");
+return;
+
+}
+
+showNewsMessage(status==="published"?"✅ खबर Publish हो गई!":"❌ खबर Reject हो गई!");
+
+await loadDashboard();
+}
+
+async function logout(){
+
+await client.auth.signOut();
+
+dashboard.classList.add("hidden");
+document.getElementById("logoutBtn").classList.add("hidden");
+
+showLoginMessage("आप Logout हो गए हैं।");
+}
+
+function escapeHtml(value){
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+async function checkSession(){
+
+const {data}=await client.auth.getSession();
+
+if(data&&data.session){
+
+dashboard.classList.remove("hidden");
+document.getElementById("logoutBtn").classList.remove("hidden");
+
+await loadDashboard();
+
+}
+
+}
+
+checkSession();
 </script>
+
 </body>
 </html>
