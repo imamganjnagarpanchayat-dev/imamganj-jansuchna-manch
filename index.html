@@ -135,6 +135,71 @@ function safeText(value){
     .replace(/'/g,"&#039;");
 }
 
+
+function getNewsShareUrl(id){
+  return window.location.origin + window.location.pathname + "?news=" + encodeURIComponent(id);
+}
+
+async function getSingleNews(id){
+  const {data,error} = await publicClient
+    .from("news")
+    .select("id,title,content")
+    .eq("id",id)
+    .eq("status","published")
+    .single();
+
+  if(error){
+    console.error("News share error:",error);
+    return null;
+  }
+
+  return data;
+}
+
+async function shareNews(id){
+  const news = await getSingleNews(id);
+
+  if(!news){
+    alert("❌ खबर नहीं मिल सकी।");
+    return;
+  }
+
+  const url = getNewsShareUrl(id);
+  const title = news.title || "इमामगंज की खबर";
+  const text =
+    title +
+    "\n\n" +
+    (news.content || "") +
+    "\n\nइमामगंज जन सूचना मंच पर पूरी खबर देखें।";
+
+  if(navigator.share){
+    try{
+      await navigator.share({
+        title: title,
+        text: text,
+        url: url
+      });
+    }catch(error){
+      if(error.name !== "AbortError"){
+        console.error("Share error:",error);
+      }
+    }
+  }else{
+    await copyNewsLink(id);
+  }
+}
+
+async function copyNewsLink(id){
+  const url = getNewsShareUrl(id);
+
+  try{
+    await navigator.clipboard.writeText(url);
+    alert("✅ खबर का Direct Link Copy हो गया।");
+  }catch(error){
+    prompt("इस लिंक को Copy करें:",url);
+  }
+}
+
 async function loadPublicNews(){
 
   const section=document.querySelector("#latest + .grid");
@@ -188,6 +253,22 @@ async function loadPublicNews(){
         ${n.location ? `<p>📍 ${safeText(n.location)}</p>` : ""}
         ${n.reporter_name ? `<p>👤 ${safeText(n.reporter_name)}</p>` : ""}
         <p style="font-size:12px;color:#888;margin-top:8px;">${date}</p>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+          <button
+            type="button"
+            onclick="shareNews(${n.id})"
+            style="flex:1;min-width:120px;padding:11px 14px;border:0;border-radius:8px;background:#1877f2;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">
+            📤 Share करें
+          </button>
+
+          <button
+            type="button"
+            onclick="copyNewsLink(${n.id})"
+            style="flex:1;min-width:120px;padding:11px 14px;border:1px solid #123;background:#fff;color:#123;font-size:15px;font-weight:700;border-radius:8px;cursor:pointer;">
+            🔗 Link Copy
+          </button>
+        </div>
       </article>
     `;
   }).join("");
