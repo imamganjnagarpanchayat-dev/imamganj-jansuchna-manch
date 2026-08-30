@@ -155,38 +155,48 @@ const {data,error}=await client
 .order("created_at",{ascending:false});
 
 if(error){
-
 showNewsMessage("❌ News load error: "+error.message,"error");
 return;
-
 }
 
 const news=data||[];
 
-document.getElementById("totalCount").textContent=news.length;
-
 const pending=news.filter(n=>n.status==="pending");
 const published=news.filter(n=>n.status==="published");
 
+document.getElementById("totalCount").textContent=news.length;
 document.getElementById("pendingCount").textContent=pending.length;
 document.getElementById("publishedCount").textContent=published.length;
 
 document.getElementById("reporterCount").textContent=0;
 document.getElementById("reporterCount2").textContent=0;
 
-if(pending.length===0){
-
-newsList.innerHTML="<div class='success'>✅ अभी कोई Pending खबर नहीं है।</div>";
+if(news.length===0){
+newsList.innerHTML="<div class='success'>✅ अभी कोई खबर नहीं है।</div>";
 newsMessage.innerHTML="";
 return;
-
 }
 
-newsList.innerHTML=pending.map(n=>`
+newsList.innerHTML=news.map(n=>{
+
+let statusText="⏳ Pending";
+let statusStyle="background:#fff3cd;color:#856404;";
+
+if(n.status==="published"){
+statusText="✅ Published";
+statusStyle="background:#d4edda;color:#155724;";
+}
+
+if(n.status==="rejected"){
+statusText="❌ Rejected";
+statusStyle="background:#f8d7da;color:#721c24;";
+}
+
+return `
 
 <div class="news-card">
 
-<span class="status">⏳ Pending</span>
+<span class="status" style="${statusStyle}">${statusText}</span>
 
 <h3>${escapeHtml(n.title||"बिना शीर्षक")}</h3>
 
@@ -204,7 +214,6 @@ ${n.image_url ? `
   <img src="${escapeHtml(n.image_url)}"
        alt="News Image"
        style="width:100%;max-width:500px;max-height:300px;object-fit:contain;border-radius:10px;border:1px solid #ddd;">
-  <p><a href="${escapeHtml(n.image_url)}" target="_blank" rel="noopener">🔗 फोटो खोलें</a></p>
 </div>
 ` : ""}
 
@@ -216,20 +225,41 @@ ${n.video_url ? `
     <source src="${escapeHtml(n.video_url)}" type="video/mp4">
     आपका ब्राउज़र वीडियो प्ले नहीं कर सकता।
   </video>
-  <p><a href="${escapeHtml(n.video_url)}" target="_blank" rel="noopener">🔗 वीडियो खोलें</a></p>
 </div>
 ` : ""}
 
-<button onclick="updateNews(${n.id},'published')">✅ Publish</button>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
 
-<button onclick="updateNews(${n.id},'rejected')">❌ Reject</button>
+${n.status==="pending" ? `
+<button
+onclick="updateNews(${n.id},'published')"
+style="flex:1;min-width:110px;">
+✅ Publish
+</button>
+
+<button
+onclick="updateNews(${n.id},'rejected')"
+style="flex:1;min-width:110px;">
+❌ Reject
+</button>
+` : ""}
+
+<button
+onclick="deleteNews(${n.id})"
+style="flex:1;min-width:110px;background:#dc3545;color:#fff;border:0;border-radius:6px;padding:10px;font-weight:700;">
+🗑️ Delete
+</button>
 
 </div>
 
-`).join("");
+</div>
+
+`;
+}).join("");
 
 newsMessage.innerHTML="";
 }
+
 
 async function updateNews(id,status){
 
@@ -243,16 +273,111 @@ const {error}=await client
 .eq("id",id);
 
 if(error){
-
 showNewsMessage("❌ "+action+" failed: "+error.message,"error");
 return;
-
 }
 
-showNewsMessage(status==="published"?"✅ खबर Publish हो गई!":"❌ खबर Reject हो गई!");
+showNewsMessage(
+status==="published"
+?"✅ खबर Publish हो गई!"
+:"❌ खबर Reject हो गई!"
+);
 
 await loadDashboard();
 }
+
+
+function getStoragePathFromUrl(url){
+
+if(!url) return null;
+
+const marker="/storage/v1/object/public/news-media/";
+
+const index=url.indexOf(marker);
+
+if(index===-1) return null;
+
+return decodeURIComponent(
+url.substring(index + marker.length)
+);
+
+}
+
+
+async function deleteNews(id){
+
+const confirmed=confirm(
+"⚠️ क्या आप इस खबर को हमेशा के लिए Delete करना चाहते हैं?\n\n"+
+"खबर के साथ उसका फोटो/वीडियो भी हटाया जाएगा।\n\n"+
+"यह कार्रवाई वापस नहीं की जा सकती।"
+);
+
+if(!confirmed) return;
+
+showNewsMessage("⏳ खबर और Media Delete हो रहा है...");
+
+const {data,error:fetchError}=await client
+.from("news")
+.select("id,title,image_url,video_url")
+.eq("id",id)
+.single();
+
+if(fetchError){
+showNewsMessage("❌ खबर नहीं मिली: "+fetchError.message,"error");
+return;
+}
+
+
+const mediaPaths=[];
+
+const imagePath=getStoragePathFromUrl(data.image_url);
+const videoPath=getStoragePathFromUrl(data.video_url);
+
+if(imagePath) mediaPaths.push(imagePath);
+if(videoPath) mediaPaths.push(videoPath);
+
+
+if(mediaPaths.length>0){
+
+const {error:storageError}=await client
+.storage
+.from("news-media")
+.remove(mediaPaths);
+
+if(storageError){
+
+showNewsMessage(
+"❌ Media Delete नहीं हो सका: "+storageError.message,
+"error"
+);
+
+return;
+}
+
+}
+
+
+const {error:deleteError}=await client
+.from("news")
+.delete()
+.eq("id",id);
+
+if(deleteError){
+
+showNewsMessage(
+"❌ खबर Delete नहीं हुई: "+deleteError.message,
+"error"
+);
+
+return;
+}
+
+showNewsMessage("✅ खबर और उसका Media सफलतापूर्वक Delete हो गया!");
+
+await loadDashboard();
+
+}
+
 
 async function logout(){
 
