@@ -37,6 +37,10 @@ nav a{padding:13px 17px;font-weight:bold}nav a:hover{background:#071f49}
 .buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:15px}
 .buttons a{background:#d71920;padding:11px 17px;border-radius:6px;font-weight:bold}
 footer{background:#061631;color:#fff;text-align:center;padding:25px;margin-top:30px;line-height:1.8}
+.founder{display:flex;align-items:center;justify-content:center;gap:14px}
+.founder img{width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid #fff}
+.founder strong{font-size:18px}
+.founder div div{font-size:14px;opacity:.9}
 @media(max-width:800px){header{flex-wrap:wrap;justify-content:center;text-align:center}.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.categories{grid-template-columns:repeat(2,1fr)}.brand{flex:none}.social{justify-content:center}.hero-main h2{font-size:24px}}
 </style>
 </head>
@@ -113,7 +117,20 @@ footer{background:#061631;color:#fff;text-align:center;padding:25px;margin-top:3
 </section>
 </main>
 
-<footer><strong>नगर पंचायत इमामगंज — जन सूचना मंच</strong><br>सही खबर • तेज खबर • आपके साथ<br>© 2026 Imamganj Jansuchna Manch</footer>
+<footer>
+  <div class="founder">
+    <img src="assets/images/vicky-arya.webp" alt="संस्थापक Vicky Arya">
+    <div>
+      <strong>Vicky Arya</strong>
+      <div>संस्थापक — जन सूचना मंच</div>
+    </div>
+  </div>
+  <div style="margin-top:15px;">
+    <strong>नगर पंचायत इमामगंज — जन सूचना मंच</strong><br>
+    सही खबर • तेज खबर • आपके साथ<br>
+    © 2026 Imamganj Jansuchna Manch
+  </div>
+</footer>
 
 <!-- PUBLIC NEWS SUPABASE START -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
