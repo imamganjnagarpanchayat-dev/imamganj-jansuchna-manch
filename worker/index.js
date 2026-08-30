@@ -1,8 +1,8 @@
 const SUPABASE_URL = "https://khuuuoaomxgabrxxbcgt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_NPbWb9gzgTQAr4xHezXt2w_3OajT3xk";
 
-const GITHUB_PAGE =
-  "https://imamganjnagarpanchayat-dev.github.io/imamganj-jansuchna-manch/index.html";
+const GITHUB_BASE =
+  "https://imamganjnagarpanchayat-dev.github.io/imamganj-jansuchna-manch";
 
 function esc(value) {
   return String(value ?? "")
@@ -41,12 +41,34 @@ export default {
     const requestUrl = new URL(request.url);
     const newsId = requestUrl.searchParams.get("news");
 
-    let htmlResponse = await fetch(GITHUB_PAGE);
+    // Static files: images, CSS, JS, admin, reporter etc.
+    // सीधे GitHub Pages से serve होंगे।
+    if (requestUrl.pathname !== "/" && !newsId) {
+      const targetUrl =
+        GITHUB_BASE + requestUrl.pathname + requestUrl.search;
 
+      return fetch(targetUrl);
+    }
+
+    // Main homepage
+    const githubPage = GITHUB_BASE + "/index.html";
+    const htmlResponse = await fetch(githubPage);
+
+    if (!htmlResponse.ok) {
+      return new Response("Website could not be loaded.", {
+        status: 502,
+        headers: {
+          "content-type": "text/plain; charset=UTF-8"
+        }
+      });
+    }
+
+    // Normal homepage without news ID
     if (!newsId) {
       return htmlResponse;
     }
 
+    // News sharing page
     const news = await getNews(newsId);
 
     if (!news) {
@@ -62,13 +84,9 @@ export default {
       news.content ||
       "इमामगंज, गया, बिहार की स्थानीय खबरें — जन सूचना मंच";
 
-    /*
-      वीडियो upload होने पर reporter system द्वारा
-      video का thumbnail image_url में save किया जाता है।
-    */
     const image =
       news.image_url ||
-      "https://imamganjnagarpanchayat-dev.github.io/imamganj-jansuchna-manch/assets/images/logo.png";
+      GITHUB_BASE + "/assets/images/logo.png";
 
     const shareUrl = requestUrl.href;
 
